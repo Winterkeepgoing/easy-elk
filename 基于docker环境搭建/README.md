@@ -20,17 +20,18 @@
  
 ### 操作命令
 
-#### 启动
+```
+# 启动
 docker-compose up
 
-#### 停止容器
+# 停止容器
 docker-compose down
 
-#### 停止容器并且移除数据
+# 停止容器并且移除数据
 docker-compose down -v
 
-#### 查看节点的运行情况
+# 查看节点的运行情况
 curl -X GET "localhost:9200/_cat/nodes?v&pretty"
-
+```
 
 
