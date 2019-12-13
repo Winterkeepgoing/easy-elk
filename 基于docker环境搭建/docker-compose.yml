@@ -1,0 +1,93 @@
+version: '2.2'
+services:
+  cerebro:
+    image: lmenezes/cerebro:0.8.5
+    container_name: cerebro
+    ports:
+      - "9000:9000"
+    command:
+      - -Dhosts.0.host=http://127.0.0.1:9200
+    networks:
+      - elastic
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    container_name: kibana75
+    environment:
+      #- I18N_LOCALE=zh-CN
+      - XPACK_GRAPH_ENABLED=true
+      - TIMELION_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+      - ELASTICSEARCH_HOSTS=http://es75_01:9200/
+      # - SERVER_NAME=localhost
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: es75_01
+    environment:
+      - node.name=es75_01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es75_02,es75_03
+      - cluster.initial_master_nodes=es75_01,es75_02,es75_03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: es75_02
+    environment:
+      - node.name=es75_02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es75_01,es75_03
+      - cluster.initial_master_nodes=es75_01,es75_02,es75_03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: es75_03
+    environment:
+      - node.name=es75_03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es75_01,es75_02
+      - cluster.initial_master_nodes=es75_01,es75_02,es75_03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
