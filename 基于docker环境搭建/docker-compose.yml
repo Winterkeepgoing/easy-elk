@@ -6,7 +6,7 @@ services:
     ports:
       - "9000:9000"
     command:
-      - -Dhosts.0.host=http://127.0.0.1:9200
+      - -Dhosts.0.host=http://es75_01:9200
     networks:
       - elastic
   kibana:
